@@ -1,0 +1,148 @@
+<html>
+
+<head>
+    <title>SolidMirage LED Animation</title>
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <script src="js/jscolor.js"></script>
+    <script src="js/LED.js"></script>
+    <script src="js/Strand.js"></script>
+    <script src="js/Animation.js"></script>
+    <!-- <script defer src="js/InteractiveGraph.js"></script> -->
+    <script src="js/animation_app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400;0,700;1,200;1,300;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="semantic-ui/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="animation_app.css">
+</head>
+
+<body>
+    
+    <div id="painting_area" style="display: flex">
+        <!-- <div id="animationArea" style="background-color: #474747; display: inline-block;"></div> -->
+        <div id="animationArea" style="flex: 0 0 65%; max-width: 917px; background-color: #474747; padding: 10 10 10 10; display: inline-block;">
+            <span id="steps"><span class="currentStep">0</span> OF <span class="totalSteps">0</span></span>
+            <div id="overlay">
+                <span id="overlay_steps"><span class="currentStep">0</span></span>
+            </div>
+            <canvas id="canvas" width="450" height="427">
+
+            </canvas>
+        </div>
+        <div id="controls" class="toolbar">
+            <div id="upload-art">
+                <div id="upload-front">
+                    <h1>FRONT</h1>
+                    <div class="ui vertical animated button">Upload Background</div>
+                    <div class="ui vertical animated button">Upload Metal</div>
+                </div>
+                <div id="upload-back">
+                    <h1>BACK</h1>
+                    <div class="ui vertical animated button">Upload Background</div>
+                    <div class="ui vertical animated button">Upload Metal</div>
+                </div>
+            </div>
+            <div id="metal-color">
+                <h1>Metal Color</h1>
+                <div id="metal-palette" class="palette">
+                    <div id="silver-metal" class="palette-block"></div>
+                    <div id="gold-metal" class="palette-block"></div>
+                </div>
+            </div>
+            <p></p>
+            <div id="led-color">
+                <h1>LED Color</h1>
+                <div id="led-palette" class="palette">
+                    <div id="white-led" class="palette-block"></div>
+                    <div id="red-led" class="palette-block"></div>
+                    <div id="green-led" class="palette-block"></div>
+                    <div id="blue-led" class="palette-block"></div>
+                </div>
+            </div>
+            <p></p>
+            <div id="led-control">
+                <h1>LED Control</h1>
+                <div class="ui vertical animated button">Place LED</div>
+                <div class="ui vertical animated button">Remove LED</div>
+            </div>
+            <div id="battery-control">
+                <h1>Battery Ctrl</h1>
+                <div class="ui vertical animated button">Place Battery Box</div>
+            </div>
+            <p></p>
+            <div id="file-control">
+                <h1>File Control</h1>
+                <div class="ui vertical animated button">Load</div>
+                <div class="ui vertical animated button">Save</div>
+            </div>
+        </div>
+    </div>  
+
+    <input type="file" id="file-selector" style="display: none;"/>
+    <ul id="output"></ul>
+</body>
+</html>
+
+<script type="text/javascript">
+    function stepFade() {
+        $("#overlay").stop();
+        $("#overlay").fadeIn(0, function(){
+            $("#overlay").fadeOut(600);
+
+        });
+    }
+    $("#newstep").click(function() { stepFade() });
+    $("#dupestep").click(function() { stepFade() });
+    $("#delstep").click(function() { stepFade() });
+    $("#overlay").hide();
+    startDraw();
+    attachFileLoaderHandler();
+
+$(document).keyup(function(e) {
+        switch(e.which) {
+            case 18:
+                setMode("pencil")
+            break;
+    }
+});
+
+$(document).keydown(function(e) {
+    var fileTextInput = document.getElementById('saveFileNameInput');
+    if(fileTextInput == document.activeElement){
+        return;
+    }
+    switch(e.which) {
+        case 18:
+            setMode("eyedropper");
+        break
+        case 69:
+            setMode("eraser");
+        break; 
+        case 70:
+            setMode("pencil");
+        break;
+        case 81:
+            newStep();
+        break;
+        case 82:
+            copyStep();
+        break;
+        case 65:
+        case 37: 
+            stepBackward();
+        break;
+        case 68:
+        case 39: 
+            stepForward();
+        break;
+        case 32: 
+            if(playing) 
+                animation.stop();
+            else
+                animation.play();
+            break;
+        break;
+
+        default: return; // exit this handler for other keys
+    }
+    e.preventDefault(); // prevent the default action (scroll / move caret)
+});
+</script>

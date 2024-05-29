@@ -1,0 +1,123 @@
+body {
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 16px;
+}
+
+#canvas {
+    background-color: #111;
+    clear:both;
+    display: block;
+    /* margin-top: 20px; */
+    /* cursor: url('assets/pencilsmall.png') 0 0, pointer; */
+    /* cursor: url('assets/pencilsmall.png') -10 40, pointer; */
+}
+.toolbar {
+    cursor: url('assets/pencilsmall.png');
+    margin-left: 20px;
+    flex: 1; 
+    background-color: #111;
+    max-width: 200px;
+    padding: 10 5 5 5;
+    font-weight: 700;
+    color: #eee;
+}
+
+.toolbar .button {
+    width: 100%;
+    
+}
+
+.toolbar .text {
+    margin-left: -7px;
+    color:red;
+}
+
+.toolbar .button .icon {
+    margin-left: -12px;
+}
+
+.toolbar .checkbox{
+    color:#ddd;
+}
+
+#steps {
+    font-weight: 700;
+    font-size: 28px;
+    color: #ddd;
+    float: left;
+    margin-bottom: 5px;
+}
+
+#controls {
+    margin-top: 15px;
+}
+
+#controls .button {
+    width: 48%;
+    float:left;
+    display: block;
+    text-align:center;
+    padding:10px;
+    min-height:40px;
+    /* padding:10px; */
+    /* line-height: 60px; */
+    /* vertical-align: top; */
+}
+
+#controls .button .icon {
+    margin-left: -12px;
+}
+
+#overlay {
+    position: absolute;
+    background-color: #333;
+    width: 1093px;
+    margin-top: 20px;
+    height: 427px;
+    opacity: 0.6;
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 200px;
+    font-size: 120px;
+}
+
+p {
+    clear:both;
+}
+
+h1{
+    margin-bottom: 2px;
+}
+
+.palette-block{
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    display: block;
+    float: left;
+    outline: 2px solid black;
+}
+
+#silver-metal{
+    background-color: #333;
+}
+
+#gold-metal{
+    background-color: gold;
+}
+
+#white-led{
+    background-color: white;
+}
+
+#red-led{
+    background-color: red;
+}
+
+#green-led{
+    background-color: green;
+}
+
+#blue-led{
+    background-color: blue;
+}
