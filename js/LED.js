@@ -1,6 +1,6 @@
 class Led 
 {
-    constructor(x, y, c = CONFIG["none_color"]) 
+    constructor(x, y, c = "#FF0000") 
     {
         this.x = x;
         this.y = y;
@@ -17,7 +17,7 @@ class Led
 
     checkCollision(x, y) 
     {
-        return (x >= this.posX && x <= this.posX + this.size && y >= this.posY && y <= this.posY + this.size)
+        return (x >= this.x && x <= this.x + this.size && y >= this.y && y <= this.y + this.size)
     }
 
     updateColor(color) 
@@ -29,7 +29,7 @@ class Led
     {         
         CTX.beginPath();
         CTX.fillStyle = this.color;
-        CTX.arc(this.x, this.y, this.size, 0, Math.PI*2, true);
+        CTX.rect(this.x, this.y, this.size, this.size);
         CTX.stroke();
         CTX.fill();
     }

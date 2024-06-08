@@ -17,7 +17,7 @@ class BatBox
 
     checkCollision(x, y) 
     {
-        return (x >= this.posX && x <= this.posX + this.size && y >= this.posY && y <= this.posY + this.size)
+        return (x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height)
     }
 
     draw() 

@@ -96,6 +96,7 @@ h1{
     display: block;
     float: left;
     outline: 2px solid black;
+    border: 2px solid black;
 }
 
 #silver-metal{

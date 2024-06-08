@@ -7,7 +7,7 @@ class Workspace
         this.bgImage = bgImage;
         this.selectedItem = undefined;
         this.selectedLEDIndex = -1;
-        this.use_color = CONFIG["none_color"];
+        this.use_color = "white";
         this.showImage = true;
     }
 
@@ -16,7 +16,13 @@ class Workspace
     }
 
     drawBatBox(){
-        this.batBox.draw();;
+        if(this.batBox){
+            this.batBox.draw();;
+        }
+    }
+
+    setColor(color){
+        this.use_color = color;
     }
 
     drawLeds(){
@@ -30,8 +36,13 @@ class Workspace
         this.selectedLEDIndex = -1;
     }
 
+    clearCanvas(){
+        CTX.clearRect(0,0,canvas.width,canvas.height);
+    }
+
     draw() 
     {   
+        this.clearCanvas();
         this.drawImage();
         this.drawBatBox();
         this.drawLeds();
@@ -39,13 +50,12 @@ class Workspace
 
     within(x,y){
         // check if in batbox
-        if(this.batBox.checkCollision(x,y)){
-            this.selectedItem = batBox;
+        if(this.batBox && this.batBox.checkCollision(x,y)){
+            this.selectedItem = this.batBox;
             return this.batBox;
         }
 
         for(let [i,led] of this.leds.entries()){
-            const led = this.leds[i]
             if(led.checkCollision(x,y)){
                 this.selectedItem = led;
                 this.selectedLEDIndex = i;
@@ -61,10 +71,18 @@ class Workspace
     }
 
     removeLED(){
-        if(this.selectedItem.name=="LED"){
+        if(this.selectedItem && this.selectedItem.name=="LED"){
             this.leds.splice(this.selectedLEDIndex,1);
             this.selectedItem = undefined;
             this.selectedLEDIndex = -1;
+        }
+        this.draw();
+    }
+
+    removeBatteryBox(){
+        if(this.batBox){
+            this.batBox = undefined;
+            this.draw();
         }
     }
 
@@ -106,7 +124,7 @@ class Workspace
 
         data.leds.forEach((led)=>{
             var newLed = new Led(led.x, led.y, led.color);
-            this.leds.push(led);
+            this.leds.push(newLed);
         });
 
         this.batBox = new BatBox(data.batBox.x, data.batBox.y);

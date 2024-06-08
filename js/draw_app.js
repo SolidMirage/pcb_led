@@ -4,11 +4,11 @@ var CONFIG = {
     "none_color": "#000000",
     "label_font": "10px Arial bold",
     "led_size": 15,
-    "led_spacing": 3,
     "image_width": 400,
     "image_height": 400,
-    "batBox_width": 20,
-    "batBox_height": 40
+    "batBox_width": 40,
+    "batBox_height": 20,
+    "batBox_color": "gold"
 }
 
 var workspace;
@@ -16,12 +16,15 @@ var colorPicking = false;
 var showImage = true;
 /* addLED, moveLED, deleteLED, addBatteryBox, moveBatteryBox, none */
 var mode = "none";
+var lastLEDColorPicked;
+var selectedOffsetX = 0;
+var selectedOffsetY = 0;
 
 var imageSelected;
 var imageOverlay = new Image();
 imageOverlay.onload=function(){
     CTX.drawImage(imageOverlay,-10,-10,CONFIG["image_width"],CONFIG["image_height"]);
-    animation.draw();
+    workspace.draw();
 }
 var imageOverlayAlpha = 1;
 
@@ -50,6 +53,19 @@ function clearCanvas()
     CTX.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+function ledColorClicked(){
+    if(lastLEDColorPicked){
+        lastLEDColorPicked.style.borderColor="black";
+    }
+    workspace.setColor(this.style.backgroundColor);
+    this.style.borderColor = "orange";
+    lastLEDColorPicked = this;
+}
+
+function removeBatteryBox(){
+    workspace.removeBatteryBox();
+}
+
 function startDraw()
 {
     var mouse_down = false;
@@ -64,21 +80,39 @@ function startDraw()
     workspace = new Workspace(leds, batBox, imageOverlay);
     workspace.draw();
 
+    var whiteLedPaletteBlock = document.getElementById("white-led");
+    whiteLedPaletteBlock.style.borderColor = "orange";
+    lastLEDColorPicked = whiteLedPaletteBlock;
+
+    var paletteItems = document.getElementsByClassName("palette-block");
+    for(var i = 0; i < paletteItems.length; i++){
+        paletteItems[i].addEventListener('click',ledColorClicked);
+    }
+
     c.onmousedown = function(e)
     {
         if(mode!='moveLED' && mode!='deleteLED' && mode!='moveBatteryBox'){
             return;
         }
+        // debugger;
         // then mode is either moveLED, deleteLED, or moveBatteryBox
-        workspace.within(e.offsetX, e.offsetY);   
+        var target = workspace.within(e.offsetX, e.offsetY);
+        if(target){
+            selectedOffsetX = target.x - e.offsetX;
+            selectedOffsetY = target.y - e.offsetY;
+        }
+        else{
+            selectedOffsetX = 0;
+            selectedOffsetY = 0;
+        }
     }
 
     c.onmousemove = function(e)
     {
         if(workspace.selectedItem && e.buttons && 
             (mode == 'addLED' || mode == 'moveLED' || mode == 'addBatteryBox' || mode=='moveBatteryBox')){
-            workspace.selectedItem.x = e.offsetX;
-            workspace.selectedItem.y = e.offsetY;
+            workspace.selectedItem.x = e.offsetX + selectedOffsetX;
+            workspace.selectedItem.y = e.offsetY + selectedOffsetY;
             workspace.draw();
         }
     }
@@ -89,18 +123,18 @@ function startDraw()
             workspace.removeLED();
         }
         if(mode =='addLED'){
-            if(!animation.selectedItem){
-                let newLED = new Led(e.offsetX,
-                                    e.offsetY,
+            if(!workspace.selectedItem){
+                let newLED = new Led(e.offsetX - CONFIG["led_size"]/2,
+                                    e.offsetY - CONFIG["led_size"]/2,
                                     workspace.use_color);
                 workspace.addLED(newLED);
             }
         }
 
         if(mode == 'addBatteryBox'){
-            if(!animation.selectedItem){
-                let newBatBox = new BatBox(e.offsetX,
-                                            e.offsetY
+            if(!workspace.selectedItem){
+                let newBatBox = new BatBox(e.offsetX - CONFIG["batBox_width"]/2,
+                                            e.offsetY - CONFIG["batBox_height"]/2
                 )
                 workspace.batBox = newBatBox;
             }
@@ -126,7 +160,6 @@ function setMode(m)
         $('#canvas').css({'cursor': "url('assets/pencilsmall.png') -10 40, pointer"});
     }
     else if (mode == "deleteLED") {
-        setColor(CONFIG["none_color"])
         $('#canvas').css({'cursor': "url('assets/erasersmall.png') -10 40, pointer"});
     }
     else if (mode == "moveLED" || mode == "moveBatteryBox"){
@@ -169,7 +202,7 @@ function readFile(file) {
 function attachFileLoaderHandler(){
     const output = document.getElementById('output');
     if (window.FileList && window.File) {
-        document.getElementById('file-selector').addEventListener('change', event => {
+        document.getElementById("file-selector").addEventListener('change', event => {
             output.innerHTML = '';
             for (const file of event.target.files) {
                 const li = document.createElement('li');
