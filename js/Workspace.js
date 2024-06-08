@@ -86,7 +86,7 @@ class Workspace
         }
     }
 
-    saveToJsonFile(){
+    async saveToJsonFile(){
         var data = {};
 
         // save location of batBox
@@ -94,18 +94,18 @@ class Workspace
 
         // save location of leds
         data.leds = this.leds;
-        const dataJson = JSON.stringify(data);
+        const dataJsonString = JSON.stringify(data);
 
-        var blob = new Blob([dataJson], {type: "application/octet-stream"});
-        var blobUrl = URL.createObjectURL(blob);
-        
-        var fileLink = document.createElement('a');
-        fileLink.href = blobUrl;
-        // TODO add file text input
-        // var fileTextInput = document.getElementById('saveFileNameInput');
-        // fileLink.download = fileTextInput.value + "animation.txt"
-        fileLink.download = "card_webapp.json";
-        fileLink.click();
+        var zip = new JSZip();
+        zip.file("card_webapp.json",dataJsonString);
+        const blob = await (await fetch(imageOverlay.src)).blob();
+        zip.file("card_webapp_image.png",blob);
+
+        zip.generateAsync({type:"blob"})
+        .then(function(content){
+            // see FileSaver.js
+            saveAs(content,"example.zip");
+        });
     }
 
     loadFromJsonFile(jsonString){
