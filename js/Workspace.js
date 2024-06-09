@@ -86,7 +86,7 @@ class Workspace
         }
     }
 
-    async saveToJsonFile(){
+    async saveToZipFile(){
         var data = {};
 
         // save location of batBox
@@ -104,11 +104,11 @@ class Workspace
         zip.generateAsync({type:"blob"})
         .then(function(content){
             // see FileSaver.js
-            saveAs(content,"example.zip");
+            saveAs(content,"card_webapp_image.zip");
         });
     }
 
-    loadFromJsonFile(jsonString){
+    loadFromJson(jsonString){
         var data = null;
         try{
             data = JSON.parse(jsonString);
@@ -122,12 +122,16 @@ class Workspace
         this.leds = [];
         this.batBox = undefined;
 
-        data.leds.forEach((led)=>{
-            var newLed = new Led(led.x, led.y, led.color);
-            this.leds.push(newLed);
-        });
+        if (data.leds) {
+            data.leds.forEach((led)=>{
+                var newLed = new Led(led.x, led.y, led.color);
+                this.leds.push(newLed);
+            });
+        }
 
-        this.batBox = new BatBox(data.batBox.x, data.batBox.y);
+        if (data.batBox) {
+            this.batBox = new BatBox(data.batBox.x, data.batBox.y);
+        }
 
         this.draw();
         return true;

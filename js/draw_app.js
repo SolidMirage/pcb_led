@@ -32,20 +32,23 @@ function selectImage(input){
     if(input.files && input.files[0]){
         var reader = new FileReader();
         reader.onload = function(e){
-            imageSelected = e.target.result;
-            imageOverlay.src = imageSelected;
-            // console.log(e.target.result);
-                if(showImage){
-                    CTX.globalAlpha=imageOverlayAlpha;
-                    CTX.globalCompositeOperation = "source-over";
-                    CTX.drawImage(imageOverlay,-10,-10,CONFIG["image_width"],CONFIG["image_height"]);
-                    CTX.globalCompositeOperation = "screen";
-                    CTX.globalAlpha=1;
-                }
+            loadImage(e.target.result);
         }
         reader.readAsDataURL(input.files[0]);
     }
     workspace.draw();
+}
+
+function loadImage(dataURL) {
+    imageSelected = dataURL;
+    imageOverlay.src = imageSelected;
+    if(showImage){
+        CTX.globalAlpha=imageOverlayAlpha;
+        CTX.globalCompositeOperation = "source-over";
+        CTX.drawImage(imageOverlay,-10,-10,CONFIG["image_width"],CONFIG["image_height"]);
+        CTX.globalCompositeOperation = "screen";
+        CTX.globalAlpha=1;
+    }
 }
 
 function clearCanvas() 
@@ -172,31 +175,36 @@ function toggleImage(){
     workspace.draw();
 }
 
-function saveToJsonFile() {
-    workspace.saveToJsonFile();
+function saveToZipFile() {
+    workspace.saveToZipFile();
 }
 
-function loadFromJsonFile(jsonString) {
-    return workspace.loadFromJsonFile(jsonString);
+function loadFromJson(jsonString) {
+    return workspace.loadFromJson(jsonString);
 }
 
 function readFile(file) {     
-    const reader = new FileReader();
-    reader.addEventListener('load', (event) => {
-        const result = event.target.result;
-        var loadResult = loadFromJsonFile(result);
-        const output = document.getElementById('output');
-        const li = document.createElement('li');
-        if (loadResult){
-            li.textContent = `Loaded workspace file!`;
+    var zip = new JSZip();
+    const output = document.getElementById('output');
+    const li = document.createElement('li');
+    zip.loadAsync(file).then(
+        function(zip) {
+            if (zip && zip.file('card_webapp.json') && zip.file('card_webapp_image.png')) {
+                li.textContent = `Loaded zip file!`;
+                output.appendChild(li);
+            }
+            zip.file('card_webapp.json').async('string').then((data) => {
+                loadFromJson(data);
+            });
+            zip.file('card_webapp_image.png').async('blob').then((data) => {
+                loadImage(URL.createObjectURL(data));
+            });
+        },
+        function (e) {
+            li.textContent = `Failed to load zip file. Error: ` + e;
             output.appendChild(li);
         }
-        else{
-            li.textContent = `Failed to load backup workspace file :(  Was it a .json file?`;
-            output.appendChild(li);
-        }
-    });
-    reader.readAsText(file);
+    )
 }
 
 function attachFileLoaderHandler(){
